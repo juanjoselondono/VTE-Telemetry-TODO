@@ -20,7 +20,6 @@ import {
 } from 'firebase/firestore';
 import { firestore } from '../../lib/firebaseClient';
 import { format } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
 
 import {
   ResponsiveContainer,
@@ -236,7 +235,7 @@ const TelemetryChart = ({
                 {loading
                   ? 'Cargando...'
                   : lastTs
-                  ? `Último dato: ${formatInTimeZone(lastTs, 'America/Bogota', "yyyy-MM-dd HH:mm:ss 'GMT'XXX")}`
+                  ? `Último dato: ${format(lastTs, "yyyy-MM-dd HH:mm:ss 'GMT'XXX")}`
                   : 'Sin datos'}
               </Typography>
             }
