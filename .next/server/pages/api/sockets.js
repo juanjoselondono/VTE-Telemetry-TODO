@@ -1,55 +1,90 @@
 "use strict";
-/*
- * ATTENTION: An "eval-source-map" devtool has been used.
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file with attached SourceMaps in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
 (() => {
 var exports = {};
-exports.id = "pages/api/sockets";
-exports.ids = ["pages/api/sockets"];
+exports.id = 516;
+exports.ids = [516];
 exports.modules = {
 
-/***/ "mqtt":
-/*!***********************!*\
-  !*** external "mqtt" ***!
-  \***********************/
+/***/ 8323:
 /***/ ((module) => {
 
 module.exports = require("mqtt");
 
 /***/ }),
 
-/***/ "socket.io":
-/*!****************************!*\
-  !*** external "socket.io" ***!
-  \****************************/
+/***/ 9505:
 /***/ ((module) => {
 
 module.exports = import("socket.io");;
 
 /***/ }),
 
-/***/ "(api)/./src/lib/mqttClient.js":
-/*!*******************************!*\
-  !*** ./src/lib/mqttClient.js ***!
-  \*******************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"connectionPromise\": () => (/* binding */ connectionPromise),\n/* harmony export */   \"mqttClient\": () => (/* binding */ mqttClient)\n/* harmony export */ });\n/* harmony import */ var mqtt__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! mqtt */ \"mqtt\");\n/* harmony import */ var mqtt__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mqtt__WEBPACK_IMPORTED_MODULE_0__);\n// src/lib/mqttClient.js\n\n// ***********************************************\n// ⚠️ CONFIGURACIÓN CLAVE\n// ***********************************************\nconst MQTT_BROKER_URL = process.env.MQTT_BROKER_URL;\nconst MQTT_USER = process.env.MQTT_USER;\nconst MQTT_PASSWORD = process.env.MQTT_PASSWORD;\nconst SUBSCRIPTION_TOPIC = process.env.SUBSCRIPTION_TOPIC;\n// ***********************************************\nlet mqttClient = null;\nlet connectionPromise = null;\n// --- Lógica de Inicialización Singleton ---\nif (!mqttClient) {\n    connectionPromise = new Promise((resolve, reject)=>{\n        // --- Opciones de Conexión ---\n        const options = {\n            username: MQTT_USER,\n            password: MQTT_PASSWORD,\n            // Aseguramos un ID único para evitar que el broker cierre otras sesiones\n            clientId: \"nextjs_backend_\" + Math.random().toString(16).substr(2, 8),\n            keepalive: 60,\n            reconnectPeriod: 1000 // Tiempo en ms para intentar reconectar\n        };\n        // 1. Conectar al broker\n        mqttClient = mqtt__WEBPACK_IMPORTED_MODULE_0___default().connect(MQTT_BROKER_URL, options);\n        // 2. Manejo del evento de CONEXIÓN EXITOSA\n        mqttClient.on(\"connect\", ()=>{\n            console.log(\"✅ Cliente MQTT conectado al broker\");\n            mqttClient.subscribe(SUBSCRIPTION_TOPIC, {\n                qos: 1\n            }, (err)=>{\n                if (err) {\n                    console.error(\"❌ Error al suscribirse:\", err);\n                } else {\n                    console.log(`Suscrito a tema: ${SUBSCRIPTION_TOPIC}`);\n                }\n            });\n            // Resolvemos la promesa para desbloquear las API Routes que están en \"await connectionPromise\"\n            resolve(mqttClient);\n        });\n        // 3. Manejo de ERRORES\n        mqttClient.on(\"error\", (error)=>{\n            console.error(\"❌ Error de conexi\\xf3n MQTT:\", error);\n            // Rechazamos la promesa solo si es un error fatal de inicio (como \"Not Authorized\")\n            // Después del inicio, el cliente intenta reconectar automáticamente\n            if (mqttClient && !mqttClient.connected) {\n                // Si la promesa aún no se ha resuelto, la rechazamos\n                // Esto permite que el try/catch en publish.js lo capture en el primer intento.\n                reject(error);\n            }\n        });\n        // 4. Manejo de MENSAJES RECIBIDOS (datos entrantes)\n        mqttClient.on(\"message\", (topic, message)=>{\n            console.log(`[MQTT RECIBIDO] Tema: ${topic.toString()}, Payload: ${message.toString()}`);\n        });\n        // 5. Manejo de CIERRE de conexión\n        mqttClient.on(\"close\", ()=>{\n            // El cliente intentará reconectar automáticamente\n            console.log(\"⚠️ Conexi\\xf3n MQTT cerrada. Reconexi\\xf3n en curso...\");\n        });\n    });\n}\n// --- Fin de Inicialización Singleton ---\n// Exportamos el cliente y la promesa para que la API Route los utilice.\n // NOTA: No necesitamos la bandera 'isConnected' si usamos 'mqttClient.connected' \n // y la lógica de la promesa para el primer chequeo.\n//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,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Q2xDWCxVQUFVLENBQUNnQixFQUFFLENBQUMsT0FBTyxFQUFFLElBQU07WUFDekIsa0RBQWtEO1lBQ2xEQyxPQUFPLENBQUNDLEdBQUcsQ0FBQyx3REFBa0QsQ0FBQyxDQUFDO1NBQ25FLENBQUMsQ0FBQztLQUNOLENBQUMsQ0FBQztDQUNOO0FBQ0QsMENBQTBDO0FBRzFDLHdFQUF3RTtBQUMvQixDQUV6QyxrRkFBa0Y7Q0FDbEYsb0RBQW9EIiwic291cmNlcyI6WyJ3ZWJwYWNrOi8vbWF0ZXJpYWwta2l0LXJlYWN0Ly4vc3JjL2xpYi9tcXR0Q2xpZW50LmpzPzIxMDciXSwic291cmNlc0NvbnRlbnQiOlsiLy8gc3JjL2xpYi9tcXR0Q2xpZW50LmpzXHJcblxyXG5pbXBvcnQgbXF0dCBmcm9tICdtcXR0JztcclxuXHJcbi8vICoqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqXHJcbi8vIOKaoO+4jyBDT05GSUdVUkFDScOTTiBDTEFWRVxyXG4vLyAqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKlxyXG5jb25zdCBNUVRUX0JST0tFUl9VUkwgPSBwcm9jZXNzLmVudi5NUVRUX0JST0tFUl9VUkw7XHJcbmNvbnN0IE1RVFRfVVNFUiA9IHByb2Nlc3MuZW52Lk1RVFRfVVNFUjtcclxuY29uc3QgTVFUVF9QQVNTV09SRCA9IHByb2Nlc3MuZW52Lk1RVFRfUEFTU1dPUkQ7XHJcbmNvbnN0IFNVQlNDUklQVElPTl9UT1BJQyA9IHByb2Nlc3MuZW52LlNVQlNDUklQVElPTl9UT1BJQztcclxuLy8gKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKioqKipcclxuXHJcbmxldCBtcXR0Q2xpZW50ID0gbnVsbDtcclxubGV0IGNvbm5lY3Rpb25Qcm9taXNlID0gbnVsbDtcclxuXHJcbi8vIC0tLSBMw7NnaWNhIGRlIEluaWNpYWxpemFjacOzbiBTaW5nbGV0b24gLS0tXHJcbmlmICghbXF0dENsaWVudCkge1xyXG4gICAgY29ubmVjdGlvblByb21pc2UgPSBuZXcgUHJvbWlzZSgocmVzb2x2ZSwgcmVqZWN0KSA9PiB7XHJcbiAgICAgICAgLy8gLS0tIE9wY2lvbmVzIGRlIENvbmV4acOzbiAtLS1cclxuICAgICAgICBjb25zdCBvcHRpb25zID0ge1xyXG4gICAgICAgICAgICB1c2VybmFtZTogTVFUVF9VU0VSLFxyXG4gICAgICAgICAgICBwYXNzd29yZDogTVFUVF9QQVNTV09SRCxcclxuICAgICAgICAgICAgLy8gQXNlZ3VyYW1vcyB1biBJRCDDum5pY28gcGFyYSBldml0YXIgcXVlIGVsIGJyb2tlciBjaWVycmUgb3RyYXMgc2VzaW9uZXNcclxuICAgICAgICAgICAgY2xpZW50SWQ6ICduZXh0anNfYmFja2VuZF8nICsgTWF0aC5yYW5kb20oKS50b1N0cmluZygxNikuc3Vic3RyKDIsIDgpLFxyXG4gICAgICAgICAgICBrZWVwYWxpdmU6IDYwLCAvLyBUaWVtcG8gZW4gc2VndW5kb3MgcGFyYSBQSU5HXHJcbiAgICAgICAgICAgIHJlY29ubmVjdFBlcmlvZDogMTAwMCAvLyBUaWVtcG8gZW4gbXMgcGFyYSBpbnRlbnRhciByZWNvbmVjdGFyXHJcbiAgICAgICAgfTtcclxuXHJcbiAgICAgICAgLy8gMS4gQ29uZWN0YXIgYWwgYnJva2VyXHJcbiAgICAgICAgbXF0dENsaWVudCA9IG1xdHQuY29ubmVjdChNUVRUX0JST0tFUl9VUkwsIG9wdGlvbnMpOyBcclxuXHJcbiAgICAgICAgLy8gMi4gTWFuZWpvIGRlbCBldmVudG8gZGUgQ09ORVhJw5NOIEVYSVRPU0FcclxuICAgICAgICBtcXR0Q2xpZW50Lm9uKCdjb25uZWN0JywgKCkgPT4ge1xyXG4gICAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIENsaWVudGUgTVFUVCBjb25lY3RhZG8gYWwgYnJva2VyJyk7XHJcbiAgICAgICAgICAgIFxyXG4gICAgICAgICAgICBtcXR0Q2xpZW50LnN1YnNjcmliZShTVUJTQ1JJUFRJT05fVE9QSUMsIHsgcW9zOiAxIH0sIChlcnIpID0+IHtcclxuICAgICAgICAgICAgICAgIGlmIChlcnIpIHtcclxuICAgICAgICAgICAgICAgICAgICBjb25zb2xlLmVycm9yKCfinYwgRXJyb3IgYWwgc3VzY3JpYmlyc2U6JywgZXJyKTtcclxuICAgICAgICAgICAgICAgIH0gZWxzZSB7XHJcbiAgICAgICAgICAgICAgICAgICAgY29uc29sZS5sb2coYFN1c2NyaXRvIGEgdGVtYTogJHtTVUJTQ1JJUFRJT05fVE9QSUN9YCk7XHJcbiAgICAgICAgICAgICAgICB9XHJcbiAgICAgICAgICAgIH0pO1xyXG4gICAgICAgICAgICBcclxuICAgICAgICAgICAgLy8gUmVzb2x2ZW1vcyBsYSBwcm9tZXNhIHBhcmEgZGVzYmxvcXVlYXIgbGFzIEFQSSBSb3V0ZXMgcXVlIGVzdMOhbiBlbiBcImF3YWl0IGNvbm5lY3Rpb25Qcm9taXNlXCJcclxuICAgICAgICAgICAgcmVzb2x2ZShtcXR0Q2xpZW50KTsgXHJcbiAgICAgICAgfSk7XHJcblxyXG4gICAgICAgIC8vIDMuIE1hbmVqbyBkZSBFUlJPUkVTXHJcbiAgICAgICAgbXF0dENsaWVudC5vbignZXJyb3InLCAoZXJyb3IpID0+IHtcclxuICAgICAgICAgICAgY29uc29sZS5lcnJvcign4p2MIEVycm9yIGRlIGNvbmV4acOzbiBNUVRUOicsIGVycm9yKTtcclxuICAgICAgICAgICAgLy8gUmVjaGF6YW1vcyBsYSBwcm9tZXNhIHNvbG8gc2kgZXMgdW4gZXJyb3IgZmF0YWwgZGUgaW5pY2lvIChjb21vIFwiTm90IEF1dGhvcml6ZWRcIilcclxuICAgICAgICAgICAgLy8gRGVzcHXDqXMgZGVsIGluaWNpbywgZWwgY2xpZW50ZSBpbnRlbnRhIHJlY29uZWN0YXIgYXV0b23DoXRpY2FtZW50ZVxyXG4gICAgICAgICAgICBpZiAobXF0dENsaWVudCAmJiAhbXF0dENsaWVudC5jb25uZWN0ZWQpIHtcclxuICAgICAgICAgICAgICAgIC8vIFNpIGxhIHByb21lc2EgYcO6biBubyBzZSBoYSByZXN1ZWx0bywgbGEgcmVjaGF6YW1vc1xyXG4gICAgICAgICAgICAgICAgLy8gRXN0byBwZXJtaXRlIHF1ZSBlbCB0cnkvY2F0Y2ggZW4gcHVibGlzaC5qcyBsbyBjYXB0dXJlIGVuIGVsIHByaW1lciBpbnRlbnRvLlxyXG4gICAgICAgICAgICAgICAgcmVqZWN0KGVycm9yKTtcclxuICAgICAgICAgICAgfVxyXG4gICAgICAgIH0pO1xyXG5cclxuICAgICAgICAvLyA0LiBNYW5lam8gZGUgTUVOU0FKRVMgUkVDSUJJRE9TIChkYXRvcyBlbnRyYW50ZXMpXHJcbiAgICAgICAgbXF0dENsaWVudC5vbignbWVzc2FnZScsICh0b3BpYywgbWVzc2FnZSkgPT4ge1xyXG4gICAgICAgICAgICBjb25zb2xlLmxvZyhgW01RVFQgUkVDSUJJRE9dIFRlbWE6ICR7dG9waWMudG9TdHJpbmcoKX0sIFBheWxvYWQ6ICR7bWVzc2FnZS50b1N0cmluZygpfWApO1xyXG4gICAgICAgIH0pO1xyXG5cclxuICAgICAgICAvLyA1LiBNYW5lam8gZGUgQ0lFUlJFIGRlIGNvbmV4acOzblxyXG4gICAgICAgIG1xdHRDbGllbnQub24oJ2Nsb3NlJywgKCkgPT4ge1xyXG4gICAgICAgICAgICAvLyBFbCBjbGllbnRlIGludGVudGFyw6EgcmVjb25lY3RhciBhdXRvbcOhdGljYW1lbnRlXHJcbiAgICAgICAgICAgIGNvbnNvbGUubG9nKCfimqDvuI8gQ29uZXhpw7NuIE1RVFQgY2VycmFkYS4gUmVjb25leGnDs24gZW4gY3Vyc28uLi4nKTtcclxuICAgICAgICB9KTtcclxuICAgIH0pO1xyXG59XHJcbi8vIC0tLSBGaW4gZGUgSW5pY2lhbGl6YWNpw7NuIFNpbmdsZXRvbiAtLS1cclxuXHJcblxyXG4vLyBFeHBvcnRhbW9zIGVsIGNsaWVudGUgeSBsYSBwcm9tZXNhIHBhcmEgcXVlIGxhIEFQSSBSb3V0ZSBsb3MgdXRpbGljZS5cclxuZXhwb3J0IHsgbXF0dENsaWVudCwgY29ubmVjdGlvblByb21pc2UgfTtcclxuXHJcbi8vIE5PVEE6IE5vIG5lY2VzaXRhbW9zIGxhIGJhbmRlcmEgJ2lzQ29ubmVjdGVkJyBzaSB1c2Ftb3MgJ21xdHRDbGllbnQuY29ubmVjdGVkJyBcclxuLy8geSBsYSBsw7NnaWNhIGRlIGxhIHByb21lc2EgcGFyYSBlbCBwcmltZXIgY2hlcXVlby4iXSwibmFtZXMiOlsibXF0dCIsIk1RVFRfQlJPS0VSX1VSTCIsInByb2Nlc3MiLCJlbnYiLCJNUVRUX1VTRVIiLCJNUVRUX1BBU1NXT1JEIiwiU1VCU0NSSVBUSU9OX1RPUElDIiwibXF0dENsaWVudCIsImNvbm5lY3Rpb25Qcm9taXNlIiwiUHJvbWlzZSIsInJlc29sdmUiLCJyZWplY3QiLCJvcHRpb25zIiwidXNlcm5hbWUiLCJwYXNzd29yZCIsImNsaWVudElkIiwiTWF0aCIsInJhbmRvbSIsInRvU3RyaW5nIiwic3Vic3RyIiwia2VlcGFsaXZlIiwicmVjb25uZWN0UGVyaW9kIiwiY29ubmVjdCIsIm9uIiwiY29uc29sZSIsImxvZyIsInN1YnNjcmliZSIsInFvcyIsImVyciIsImVycm9yIiwiY29ubmVjdGVkIiwidG9waWMiLCJtZXNzYWdlIl0sInNvdXJjZVJvb3QiOiIifQ==\n//# sourceURL=webpack-internal:///(api)/./src/lib/mqttClient.js\n");
-
-/***/ }),
-
-/***/ "(api)/./src/pages/api/sockets.js":
-/*!**********************************!*\
-  !*** ./src/pages/api/sockets.js ***!
-  \**********************************/
+/***/ 5320:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-eval("__webpack_require__.a(module, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {\n__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"default\": () => (__WEBPACK_DEFAULT_EXPORT__)\n/* harmony export */ });\n/* harmony import */ var socket_io__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! socket.io */ \"socket.io\");\n/* harmony import */ var _lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../lib/mqttClient */ \"(api)/./src/lib/mqttClient.js\");\nvar __webpack_async_dependencies__ = __webpack_handle_async_dependencies__([socket_io__WEBPACK_IMPORTED_MODULE_0__]);\nsocket_io__WEBPACK_IMPORTED_MODULE_0__ = (__webpack_async_dependencies__.then ? (await __webpack_async_dependencies__)() : __webpack_async_dependencies__)[0];\n\n\nconst ioHandler = (req, res)=>{\n    if (res.socket.server.io) {\n        console.log(\"Socket.IO ya est\\xe1 corriendo.\");\n        res.end();\n        return;\n    }\n    const io = new socket_io__WEBPACK_IMPORTED_MODULE_0__.Server(res.socket.server, {\n        path: \"/api/sockets\",\n        addTrailingSlash: false\n    });\n    res.socket.server.io = io;\n    console.log(\"Socket.IO Server inicializado.\");\n    // Vincular MQTT → Socket.IO (solo una vez)\n    if (_lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__.mqttClient && !_lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__.mqttClient.__socket_io_hooked) {\n        _lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__.mqttClient.on(\"message\", (topic, message)=>{\n            let data;\n            try {\n                const str = message.toString();\n                data = JSON.parse(str);\n            } catch  {\n                data = message;\n            }\n            // Tomar los datos del interior si vienen dentro de \"message\"\n            const inner = data.message || data;\n            const WHEEL_DIAMETER = 0.6; // en metros\n            const payload = {\n                rpm: inner.rpm,\n                potencia: inner.potencia,\n                battery: inner.battery,\n                speed: parseInt(2 * Math.PI * (WHEEL_DIAMETER / 2) * inner.rpm * 60 / 1000),\n                timestamp: new Date().toISOString()\n            };\n            io.emit(\"mqtt_data\", payload);\n            console.log(\"[Socket.IO] Nuevo mensaje MQTT recibido:\");\n            console.dir(payload, {\n                depth: null\n            });\n        });\n        _lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__.mqttClient.__socket_io_hooked = true;\n    }\n    io.on(\"connection\", (socket)=>{\n        console.log(` Cliente web conectado: ${socket.id}`);\n        socket.on(\"disconnect\", ()=>{\n            console.log(` Cliente web desconectado: ${socket.id}`);\n        });\n    });\n    res.end();\n};\n/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ioHandler);\n\n__webpack_async_result__();\n} catch(e) { __webpack_async_result__(e); } });//# sourceURL=[module]\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,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QUMiLCJzb3VyY2VzIjpbIndlYnBhY2s6Ly9tYXRlcmlhbC1raXQtcmVhY3QvLi9zcmMvcGFnZXMvYXBpL3NvY2tldHMuanM/OWEzNSJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBTZXJ2ZXIgfSBmcm9tICdzb2NrZXQuaW8nO1xyXG5pbXBvcnQgeyBtcXR0Q2xpZW50IH0gZnJvbSAnLi4vLi4vbGliL21xdHRDbGllbnQnO1xyXG5cclxuY29uc3QgaW9IYW5kbGVyID0gKHJlcSwgcmVzKSA9PiB7XHJcbiAgaWYgKHJlcy5zb2NrZXQuc2VydmVyLmlvKSB7XHJcbiAgICBjb25zb2xlLmxvZygnU29ja2V0LklPIHlhIGVzdMOhIGNvcnJpZW5kby4nKTtcclxuICAgIHJlcy5lbmQoKTtcclxuICAgIHJldHVybjtcclxuICB9XHJcblxyXG4gIGNvbnN0IGlvID0gbmV3IFNlcnZlcihyZXMuc29ja2V0LnNlcnZlciwge1xyXG4gICAgcGF0aDogJy9hcGkvc29ja2V0cycsXHJcbiAgICBhZGRUcmFpbGluZ1NsYXNoOiBmYWxzZSxcclxuICB9KTtcclxuXHJcbiAgcmVzLnNvY2tldC5zZXJ2ZXIuaW8gPSBpbztcclxuICBjb25zb2xlLmxvZygnU29ja2V0LklPIFNlcnZlciBpbmljaWFsaXphZG8uJyk7XHJcblxyXG4gIC8vIFZpbmN1bGFyIE1RVFQg4oaSIFNvY2tldC5JTyAoc29sbyB1bmEgdmV6KVxyXG4gIGlmIChtcXR0Q2xpZW50ICYmICFtcXR0Q2xpZW50Ll9fc29ja2V0X2lvX2hvb2tlZCkge1xyXG4gICAgbXF0dENsaWVudC5vbignbWVzc2FnZScsICh0b3BpYywgbWVzc2FnZSkgPT4ge1xyXG4gICAgICBsZXQgZGF0YTtcclxuXHJcbiAgICAgIHRyeSB7XHJcbiAgICAgICAgY29uc3Qgc3RyID0gbWVzc2FnZS50b1N0cmluZygpO1xyXG4gICAgICAgIGRhdGEgPSBKU09OLnBhcnNlKHN0cik7XHJcbiAgICAgIH0gY2F0Y2gge1xyXG4gICAgICAgIGRhdGEgPSBtZXNzYWdlO1xyXG4gICAgICB9XHJcblxyXG4gICAgICAvLyBUb21hciBsb3MgZGF0b3MgZGVsIGludGVyaW9yIHNpIHZpZW5lbiBkZW50cm8gZGUgXCJtZXNzYWdlXCJcclxuICAgICAgY29uc3QgaW5uZXIgPSBkYXRhLm1lc3NhZ2UgfHwgZGF0YTtcclxuICAgICAgY29uc3QgV0hFRUxfRElBTUVURVIgPSAwLjY7IC8vIGVuIG1ldHJvc1xyXG4gICAgICBjb25zdCBwYXlsb2FkID0ge1xyXG4gICAgICAgIHJwbTogaW5uZXIucnBtLFxyXG4gICAgICAgIHBvdGVuY2lhOiBpbm5lci5wb3RlbmNpYSxcclxuICAgICAgICBiYXR0ZXJ5OiBpbm5lci5iYXR0ZXJ5LFxyXG4gICAgICAgIHNwZWVkOiBwYXJzZUludCgoMiAqIE1hdGguUEkgKiAoV0hFRUxfRElBTUVURVIvMikgKiBpbm5lci5ycG0gKiA2MCkgLyAxMDAwKSxcclxuICAgICAgICB0aW1lc3RhbXA6IG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKSxcclxuICAgICAgfTtcclxuXHJcbiAgICAgIGlvLmVtaXQoJ21xdHRfZGF0YScsIHBheWxvYWQpO1xyXG5cclxuICAgICAgY29uc29sZS5sb2coJ1tTb2NrZXQuSU9dIE51ZXZvIG1lbnNhamUgTVFUVCByZWNpYmlkbzonKTtcclxuICAgICAgY29uc29sZS5kaXIocGF5bG9hZCwgeyBkZXB0aDogbnVsbCB9KTtcclxuICAgIH0pO1xyXG5cclxuICAgIG1xdHRDbGllbnQuX19zb2NrZXRfaW9faG9va2VkID0gdHJ1ZTtcclxuICB9XHJcblxyXG4gIGlvLm9uKCdjb25uZWN0aW9uJywgKHNvY2tldCkgPT4ge1xyXG4gICAgY29uc29sZS5sb2coYCBDbGllbnRlIHdlYiBjb25lY3RhZG86ICR7c29ja2V0LmlkfWApO1xyXG4gICAgc29ja2V0Lm9uKCdkaXNjb25uZWN0JywgKCkgPT4ge1xyXG4gICAgICBjb25zb2xlLmxvZyhgIENsaWVudGUgd2ViIGRlc2NvbmVjdGFkbzogJHtzb2NrZXQuaWR9YCk7XHJcbiAgICB9KTtcclxuICB9KTtcclxuXHJcbiAgcmVzLmVuZCgpO1xyXG59O1xyXG5cclxuZXhwb3J0IGRlZmF1bHQgaW9IYW5kbGVyO1xyXG4iXSwibmFtZXMiOlsiU2VydmVyIiwibXF0dENsaWVudCIsImlvSGFuZGxlciIsInJlcSIsInJlcyIsInNvY2tldCIsInNlcnZlciIsImlvIiwiY29uc29sZSIsImxvZyIsImVuZCIsInBhdGgiLCJhZGRUcmFpbGluZ1NsYXNoIiwiX19zb2NrZXRfaW9faG9va2VkIiwib24iLCJ0b3BpYyIsIm1lc3NhZ2UiLCJkYXRhIiwic3RyIiwidG9TdHJpbmciLCJKU09OIiwicGFyc2UiLCJpbm5lciIsIldIRUVMX0RJQU1FVEVSIiwicGF5bG9hZCIsInJwbSIsInBvdGVuY2lhIiwiYmF0dGVyeSIsInNwZWVkIiwicGFyc2VJbnQiLCJNYXRoIiwiUEkiLCJ0aW1lc3RhbXAiLCJEYXRlIiwidG9JU09TdHJpbmciLCJlbWl0IiwiZGlyIiwiZGVwdGgiLCJpZCJdLCJzb3VyY2VSb290IjoiIn0=\n//# sourceURL=webpack-internal:///(api)/./src/pages/api/sockets.js\n");
+__webpack_require__.a(module, async (__webpack_handle_async_dependencies__, __webpack_async_result__) => { try {
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var socket_io__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9505);
+/* harmony import */ var _lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7214);
+var __webpack_async_dependencies__ = __webpack_handle_async_dependencies__([socket_io__WEBPACK_IMPORTED_MODULE_0__]);
+socket_io__WEBPACK_IMPORTED_MODULE_0__ = (__webpack_async_dependencies__.then ? (await __webpack_async_dependencies__)() : __webpack_async_dependencies__)[0];
+
+
+const ioHandler = (req, res)=>{
+    if (res.socket.server.io) {
+        console.log("Socket.IO ya est\xe1 corriendo.");
+        res.end();
+        return;
+    }
+    const io = new socket_io__WEBPACK_IMPORTED_MODULE_0__.Server(res.socket.server, {
+        path: "/api/sockets",
+        addTrailingSlash: false
+    });
+    res.socket.server.io = io;
+    console.log("Socket.IO Server inicializado.");
+    // Vincular MQTT → Socket.IO (solo una vez)
+    if (_lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__/* .mqttClient */ .O && !_lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__/* .mqttClient.__socket_io_hooked */ .O.__socket_io_hooked) {
+        _lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__/* .mqttClient.on */ .O.on("message", (topic, message)=>{
+            let data;
+            try {
+                const str = message.toString();
+                data = JSON.parse(str);
+            } catch  {
+                data = message;
+            }
+            // Tomar los datos del interior si vienen dentro de "message"
+            const inner = data.message || data;
+            const WHEEL_DIAMETER = 0.6; // en metros
+            const payload = {
+                rpm: inner.rpm,
+                potencia: inner.potencia,
+                battery: inner.battery,
+                speed: parseInt(2 * Math.PI * (WHEEL_DIAMETER / 2) * inner.rpm * 60 / 1000),
+                timestamp: new Date().toISOString()
+            };
+            io.emit("mqtt_data", payload);
+            console.log("[Socket.IO] Nuevo mensaje MQTT recibido:");
+            console.dir(payload, {
+                depth: null
+            });
+        });
+        _lib_mqttClient__WEBPACK_IMPORTED_MODULE_1__/* .mqttClient.__socket_io_hooked */ .O.__socket_io_hooked = true;
+    }
+    io.on("connection", (socket)=>{
+        console.log(` Cliente web conectado: ${socket.id}`);
+        socket.on("disconnect", ()=>{
+            console.log(` Cliente web desconectado: ${socket.id}`);
+        });
+    });
+    res.end();
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (ioHandler);
+
+__webpack_async_result__();
+} catch(e) { __webpack_async_result__(e); } });
 
 /***/ })
 
@@ -60,7 +95,7 @@ eval("__webpack_require__.a(module, async (__webpack_handle_async_dependencies__
 var __webpack_require__ = require("../../webpack-api-runtime.js");
 __webpack_require__.C(exports);
 var __webpack_exec__ = (moduleId) => (__webpack_require__(__webpack_require__.s = moduleId))
-var __webpack_exports__ = (__webpack_exec__("(api)/./src/pages/api/sockets.js"));
+var __webpack_exports__ = __webpack_require__.X(0, [214], () => (__webpack_exec__(5320)));
 module.exports = __webpack_exports__;
 
 })();
